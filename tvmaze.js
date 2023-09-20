@@ -3,6 +3,7 @@
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
+const BASE_URL = 'http://api.tvmaze.com/';
 
 
 /** Given a search term, search for tv shows that match that query.
@@ -15,14 +16,12 @@ const $searchForm = $("#searchForm");
 async function getShowsByTerm(term) {
 
   const params = new URLSearchParams({ q: term });
-  const response = await fetch(`http://api.tvmaze.com/search/shows?${params}`);
+  const response = await fetch(`${BASE_URL}search/shows?${params}`);
   const data = await response.json();
 
   const showsInfo = await data.map(function (show) {
-    let defaultImage = `https://store-images.s-microsoft.com/image/apps.65316.13510798887490672.6e1ebb25-96c8-4504-b714-1f7cbca3c5ad.f9514a23-1eb8-4916-a18e-99b1a9817d15?mode=scale&q=90&h=300&w=300`;
+    let defaultImage = (show.show.image?.medium || `https://store-images.s-microsoft.com/image/apps.65316.13510798887490672.6e1ebb25-96c8-4504-b714-1f7cbca3c5ad.f9514a23-1eb8-4916-a18e-99b1a9817d15?mode=scale&q=90&h=300&w=300`);
 
-    if (show.show.image) defaultImage = show.show.image.medium;
-    
     return {
       id: show.show.id,
       name: show.show.name,
@@ -30,8 +29,6 @@ async function getShowsByTerm(term) {
       image: defaultImage,
     };
   });
-
-  console.log("Show Info", showsInfo);
 
   return showsInfo;
   // REFERENCE RETURN
