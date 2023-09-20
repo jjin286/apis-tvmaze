@@ -13,25 +13,28 @@ const $searchForm = $("#searchForm");
  */
 
 async function getShowsByTerm(term) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
 
-  const params = new URLSearchParams({q: term});
+  const params = new URLSearchParams({ q: term });
   const response = await fetch(`http://api.tvmaze.com/search/shows?${params}`);
   const data = await response.json();
 
-  const showsInfo = data.map(function(show){
+  const showsInfo = await data.map(function (show) {
+    let defaultImage = `https://store-images.s-microsoft.com/image/apps.65316.13510798887490672.6e1ebb25-96c8-4504-b714-1f7cbca3c5ad.f9514a23-1eb8-4916-a18e-99b1a9817d15?mode=scale&q=90&h=300&w=300`;
+
+    if (show.show.image) defaultImage = show.show.image.medium;
+    
     return {
       id: show.show.id,
       name: show.show.name,
       summary: show.show.summary,
-      image: show.show.image.medium,
-    }
-  })
+      image: defaultImage,
+    };
+  });
 
   console.log("Show Info", showsInfo);
 
   return showsInfo;
-// REFERENCE RETURN
+  // REFERENCE RETURN
   // return [
   //   {
   //     id: 1767,
@@ -66,8 +69,8 @@ function displayShows(shows) {
         <div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
-              alt="Bletchly Circle San Francisco"
+              src="${show.image}"
+              alt="${show.name}"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
@@ -97,7 +100,7 @@ async function searchShowsAndDisplay() {
   displayShows(shows);
 }
 
-$searchForm.on("submit", async function handleSearchForm (evt) {
+$searchForm.on("submit", async function handleSearchForm(evt) {
   evt.preventDefault();
   await searchShowsAndDisplay();
 });
