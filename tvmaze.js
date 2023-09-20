@@ -1,6 +1,8 @@
 "use strict";
 
 const $showsList = $("#showsList");
+const $revealEpsBtn = $(".Show-getEpisodes")
+const $episodesList = $("#episodesList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const BASE_URL = 'http://api.tvmaze.com/';
@@ -107,10 +109,38 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) {
+  const response = await fetch(`${BASE_URL}shows/${id}/episodes`);
+  const data = await response.json();
+
+  const episodesList = await data.map(function (episode) {
+
+    return {
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number,
+    };
+  })
+
+  return episodesList;
+}
 
 /** Write a clear docstring for this function... */
 
-// function displayEpisodes(episodes) { }
+function displayEpisodes(episodes) {
+  // $episodesArea.empty();
+
+  for (const episode of episodes) {
+    const $episode = $(`
+        <li>${episode.name} (season ${episode.season}, number ${episode.number})</li>
+      `);
+
+    $episodesList.append($episode);
+  }
+}
 
 // add other functions that will be useful / match our structure & design
+$($revealEpsBtn).on("click", function(evt){
+
+})
