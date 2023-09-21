@@ -1,13 +1,13 @@
 "use strict";
 
 const $showsList = $("#showsList");
-const $revealEpsBtn = $(".Show-getEpisodes")
+const $revealEpsBtn = $(".Show-getEpisodes");
 const $episodesList = $("#episodesList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const BASE_URL = 'http://api.tvmaze.com/';
 
-
+console.log($revealEpsBtn);
 /** Given a search term, search for tv shows that match that query.
  *
  *  Returns (promise) array of show objects: [show, show, ...].
@@ -121,15 +121,18 @@ async function getEpisodesOfShow(id) {
       season: episode.season,
       number: episode.number,
     };
-  })
+  });
 
   return episodesList;
 }
 
-/** Write a clear docstring for this function... */
+/**
+ * Given list of episodes, create markup for each and append to DOM.
+ *
+ * An episode is {id, name, season, number}
+ */
 
 function displayEpisodes(episodes) {
-  // $episodesArea.empty();
 
   for (const episode of episodes) {
     const $episode = $(`
@@ -140,7 +143,22 @@ function displayEpisodes(episodes) {
   }
 }
 
-// add other functions that will be useful / match our structure & design
-$($revealEpsBtn).on("click", function(evt){
+/** Handle episodes list button: get episodes from API and display.
+ *    Show episodes area (that only gets shown if they ask for episodes)
+ */
+async function getEpisodesAndDisplay(evt) {
+  $episodesList.empty();
 
-})
+  let $parentElement = $(evt.target).closest('.Show');
+  let showId = $parentElement.data('show-id');
+
+  const episodesList = await getEpisodesOfShow(showId);
+  displayEpisodes(episodesList);
+
+  $episodesArea.show();
+}
+
+
+$showsList.on("click", '.Show-getEpisodes', async function (evt) {
+  await getEpisodesAndDisplay(evt);
+});
